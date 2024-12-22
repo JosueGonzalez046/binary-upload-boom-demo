@@ -34,8 +34,8 @@ UserSchema.methods.comparePassword = function comparePassword(
   candidatePassword,
   cb
 ) {
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    cb(err, isMatch);
+  bcrypt.compare(candidatePassword, this.password,(err, isMatch) => {
+    return (err, isMatch);
   });
 };
 

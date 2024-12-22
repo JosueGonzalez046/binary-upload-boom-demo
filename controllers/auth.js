@@ -2,7 +2,8 @@ const passport = require("passport");
 const validator = require("validator");
 const User = require("../models/User");
 
-exports.getLogin = (req, res) => {
+
+exports.getLogin = (req, res, next) => {
   if (req.user) {
     return res.redirect("/profile");
   }
@@ -25,7 +26,7 @@ exports.postLogin = (req, res, next) => {
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
   });
-
+  
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       return next(err);
@@ -33,7 +34,8 @@ exports.postLogin = (req, res, next) => {
     if (!user) {
       req.flash("errors", info);
       return res.redirect("/login");
-    }
+    };
+
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
@@ -42,7 +44,10 @@ exports.postLogin = (req, res, next) => {
       res.redirect(req.session.returnTo || "/profile");
     });
   })(req, res, next);
+  
 };
+
+
 
 exports.logout = (req, res) => {
   req.logout(() => {
