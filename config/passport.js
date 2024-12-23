@@ -2,6 +2,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const passport = require("passport");
+
 module.exports = function (passport) {
 passport.use(
   new LocalStrategy(
@@ -20,24 +21,22 @@ passport.use(
               "Your account was registered using a sign-in provider. To enable password login, sign in using a provider, and then set a password under your user profile.",
           });
         }
-
-        // Compare the password
-        
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
+        user.comparePassword(password, (err, isMatch) => {
+          if (err) {
+            return done(err);
+          }
+          if (isMatch) {
+            return done(null, user);
+          }
           return done(null, false, { msg: "Invalid email or password." });
-        }
-
-        return done(null, user); // Successful authentication
+        });
+        // return done(null, user); // Successful authentication
       } catch (err) {
         return done(err); // Handle errors
       }
     }
   )
 );
-
-
-
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
